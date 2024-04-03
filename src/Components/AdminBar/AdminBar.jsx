@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -11,15 +11,24 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import CallMissedOutgoingIcon from "@mui/icons-material/CallMissedOutgoing";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Divider } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
 import CloseIcon from "@mui/icons-material/Close";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import HomeIcon from "@mui/icons-material/Home";
+import { AuthContext } from "../../Context/AuthContext";
 
 const AdminBar = () => {
   const [openSidebar, setOpenSidebar] = useState(false);
+  const { user, handleLogout } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user.isAdmin) {
+      navigate("/sign-in");
+    }
+  }, [user, navigate]);
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -49,7 +58,9 @@ const AdminBar = () => {
             >
               Dashboard
             </Typography>
-            <Button color="inherit">Logout</Button>
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
           </Toolbar>
         </AppBar>
       </Box>

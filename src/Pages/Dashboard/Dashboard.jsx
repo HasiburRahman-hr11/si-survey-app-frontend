@@ -1,8 +1,10 @@
 import { Box, Container, Typography } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
 import AdminBar from "../../Components/AdminBar/AdminBar";
+import { AuthContext } from "../../Context/AuthContext";
 
 const Dashboard = () => {
+  const { user } = useContext(AuthContext);
   return (
     <>
       <AdminBar />
@@ -14,14 +16,14 @@ const Dashboard = () => {
               variant="h3"
               sx={{ fontFamily: '"Cormorant", serif', fontWeight: "700" }}
             >
-              This is The Admin Dashboard.
+              Welcome Aboard {user.name}.
             </Typography>
             <Typography
               component="p"
               variant="p"
               sx={{ fontSize: "18px", mt: "20px", fontWeight: "300" }}
             >
-              Checkout the Sidebar menu for available Admin Routes.
+              Checkout the Sidebar menu for available Routes.
             </Typography>
           </Box>
         </Container>

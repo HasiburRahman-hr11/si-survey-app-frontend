@@ -1,8 +1,11 @@
-import { Box, Typography } from "@mui/material";
-import React from "react";
+import { Box, Button, Typography } from "@mui/material";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../Context/AuthContext";
 
 const Navbar = () => {
+  const { user, handleLogout } = useContext(AuthContext);
+
   return (
     <Box
       component="header"
@@ -14,7 +17,9 @@ const Navbar = () => {
         backgroundColor: "#fff",
       }}
     >
-      <Box sx={{ maxWidth: "1920px", margin: "0 auto", px: "50px", py:'10px' }}>
+      <Box
+        sx={{ maxWidth: "1920px", margin: "0 auto", px: "50px", py: "10px" }}
+      >
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box>
             <Link to="/" style={{ textDecoration: "none" }}>
@@ -33,11 +38,20 @@ const Navbar = () => {
             }}
           >
             <Box component="li">
-              <Link to="/sign-in" style={{ textDecoration: "none" }}>
-                <Typography sx={{ color: "#000", p: "10px" }}>
-                  Sign In
-                </Typography>
-              </Link>
+              {user?.email ? (
+                <Button
+                  sx={{ color: "#000", p: "10px" }}
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              ) : (
+                <Link to="/sign-in" style={{ textDecoration: "none" }}>
+                  <Typography sx={{ color: "#000", p: "10px" }}>
+                    Sign In
+                  </Typography>
+                </Link>
+              )}
             </Box>
           </Box>
         </Box>

@@ -1,5 +1,5 @@
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
-import React, {  useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Alert from "@mui/material/Alert";
@@ -11,13 +11,24 @@ const AddMission = ({ openModal, handleCloseModal }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const handleSubmit = () => {
-    if(!title || !description){
-        alert("Please Fill The Form First!")
-    }else{
-        setAddMissionSuccess(true);
-    handleCloseModal();
+    if (!title || !description) {
+      alert("Please Fill The Form First!");
+    } else {
+      setAddMissionSuccess(true);
+      handleCloseModal();
     }
   };
+
+  useEffect(() => {
+    // Close Alert after 5 seconds
+    let closeAlertTimer = setTimeout(() => {
+      setAddMissionSuccess(false);
+    }, 5000);
+
+    return () => {
+      clearTimeout(closeAlertTimer);
+    };
+  }, []);
 
   return (
     <>

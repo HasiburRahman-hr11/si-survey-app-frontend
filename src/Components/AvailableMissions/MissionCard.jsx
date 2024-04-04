@@ -12,7 +12,6 @@ const MissionCard = ({ mission }) => {
 
   const { user } = useContext(AuthContext);
 
-
   // const isUserParticipant = (mission) => {
   //   return mission.participants.includes(user.userId);
   // };
@@ -27,15 +26,15 @@ const MissionCard = ({ mission }) => {
     }
     setIsUpdating(true);
     try {
-      const res = await axios.put("http://localhost:8000/mission/add-user", {
+      const res = await axios.put(`${process.env.REACT_APP_BASE_API_URL}/mission/add-user`, {
         userId: user.userId,
         missionId: mission._id,
       });
-      if(res.status === 404){
+      if (res.status === 404) {
         setError("Mission not found!");
         setAlertPopup(true);
       }
-      if(res.status === 400){
+      if (res.status === 400) {
         setError("User is already a participant in this mission.");
         setAlertPopup(true);
       }
@@ -43,7 +42,7 @@ const MissionCard = ({ mission }) => {
         setError("");
         setResponseMessage("Participated successfully.");
         setAlertPopup(true);
-        setIsJoined(true)
+        setIsJoined(true);
       }
       setIsUpdating(false);
     } catch (error) {
@@ -58,16 +57,16 @@ const MissionCard = ({ mission }) => {
     }
   };
 
-  const handleCancelMission = async() =>{
+  const handleCancelMission = async () => {
     closeAlertTimer();
 
     setIsUpdating(true);
     try {
-      const res = await axios.put("http://localhost:8000/mission/remove-user", {
+      const res = await axios.put(`${process.env.REACT_APP_BASE_API_URL}/mission/remove-user`, {
         userId: user.userId,
         missionId: mission._id,
       });
-      if(res.status === 404){
+      if (res.status === 404) {
         setError("Something went wrong!");
         setAlertPopup(true);
       }
@@ -76,9 +75,9 @@ const MissionCard = ({ mission }) => {
         setError("");
         setResponseMessage("Mission canceled successfully.");
         setAlertPopup(true);
-        setIsJoined(false)
+        setIsJoined(false);
       }
-     
+
       setIsUpdating(false);
     } catch (error) {
       if (error.response && error.response.data) {
@@ -90,7 +89,7 @@ const MissionCard = ({ mission }) => {
       console.error(error);
       setIsUpdating(false);
     }
-  }
+  };
 
   // Close Alert after 5 seconds
   const closeAlertTimer = () => {
@@ -98,14 +97,14 @@ const MissionCard = ({ mission }) => {
       setAlertPopup(false);
     }, 5000);
   };
-  useEffect(()=>{
-    if(mission.participants.includes(user.userId)){
+  useEffect(() => {
+    if (mission.participants.includes(user.userId)) {
       setIsJoined(true);
     }
-    if(!user.userId){
+    if (!user.userId) {
       setIsJoined(false);
     }
-  },[mission, user]);
+  }, [mission, user]);
   return (
     <>
       {alertPopup && (
@@ -123,26 +122,33 @@ const MissionCard = ({ mission }) => {
           height: "100%",
           border: "1px solid #f1f1f1",
           borderRadius: "10px",
-          backgroundColor: `${isJoined ? "rgb(211, 243, 226)" : "#fff"
-          }`,
+          backgroundColor: `${isJoined ? "rgb(211, 243, 226)" : "#fff"}`,
           boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
           padding: "30px 30px",
+          opacity:`${mission?.isOpen ? 1 : 0.8}`,
+          cursor:`${!mission?.isOpen ? "not-allowed" : "unset"}`
         }}
       >
         <Typography
           variant="h4"
           sx={{
-            mb: "15px",
+            mb: "5px",
             fontFamily: '"Cormorant", serif',
             fontWeight: "700",
+            fontSize: {
+              xs: "25px",
+              md: "35px",
+            },
           }}
         >
           {mission?.title}
         </Typography>
+
         <Typography
           component="p"
           variant="p"
           sx={{
+            mt: "20px",
             fontFamily: '"Roboto", sans-serif',
             fontWeight: "300",
             color: "#333333",
@@ -159,9 +165,24 @@ const MissionCard = ({ mission }) => {
             justifyContent: "space-between",
             alignItems: "center",
             mt: "30px",
+            flexDirection:{
+              xs:"column",
+              md:"row"
+            }
           }}
         >
-          <Box sx={{ width: "47%" }}>
+          <Box
+            sx={{
+              width: {
+                md: "60%",
+                xs: "100%",
+              },
+              mb:{
+                md:"0",
+                xs:"15px"
+              }
+            }}
+          >
             <Typography
               component="p"
               variant="p"
@@ -185,9 +206,24 @@ const MissionCard = ({ mission }) => {
               ></Box>
               Status: {mission?.isOpen ? "Open" : "Closed"}
             </Typography>
+            <Typography
+              sx={{
+                fontSize:"12px",
+                fontWeight: "300",
+                mt: "5px",
+              }}
+            >
+              Mission was created on:{" "}
+              <Box variant="b" component="b" sx={{ color: "#777" }}>
+                {new Date(mission.createdAt).toLocaleDateString()}
+              </Box>
+            </Typography>
           </Box>
           {mission?.isOpen && (
-            <Box sx={{ width: "max-content" }}>
+            <Box sx={{  width: {
+              md: "max-content",
+              xs: "100%",
+            }, }}>
               {!isJoined ? (
                 <Button
                   variant="outlined"
@@ -198,7 +234,13 @@ const MissionCard = ({ mission }) => {
                   {isUpdating ? "Updating..." : "Participate"}
                 </Button>
               ) : (
-                <Button variant="outlined" size="medium" onClick={handleCancelMission} disabled={isUpdating}>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  color="error"
+                  onClick={handleCancelMission}
+                  disabled={isUpdating}
+                >
                   {isUpdating ? "Updating..." : "Cancel Mission"}
                 </Button>
               )}

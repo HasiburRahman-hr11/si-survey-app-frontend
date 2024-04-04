@@ -37,7 +37,7 @@ const AddMission = ({ openModal, handleCloseModal }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:8000/mission/create`,
+        `${process.env.REACT_APP_BASE_API_URL}/mission/create`,
         {
           title,
           description,

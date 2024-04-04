@@ -39,7 +39,7 @@ const EditMission = ({ openModal, handleCloseModal, missionData }) => {
 
     try {
       const res = await axios.put(
-        `http://localhost:8000/mission/update/${missionData._id}`,
+        `${process.env.REACT_APP_BASE_API_URL}/mission/update/${missionData._id}`,
         {
           title,
           description,

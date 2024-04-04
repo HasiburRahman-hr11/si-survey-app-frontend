@@ -3,14 +3,19 @@ import { useEffect, useState } from "react";
 
 const useMission = () => {
   const [missions, setMissions] = useState([]);
+  const [loadingMissions, setLoadingMissions] = useState(false);
+
   const getAllMissions = async () => {
+    setLoadingMissions(true);
     try {
-      const res = await axios.get("http://localhost:8000/mission/get-all");
+      const res = await axios.get(`${process.env.REACT_APP_BASE_API_URL}/mission/get-all`);
       if (res.data) {
         setMissions(res.data);
+        setLoadingMissions(false);
       }
     } catch (error) {
       console.log(error);
+      setLoadingMissions(false);
     }
   };
 
@@ -23,7 +28,8 @@ const useMission = () => {
   return {
     missions,
     setMissions,
-    getAllMissions
+    getAllMissions,
+    loadingMissions
   };
 };
 

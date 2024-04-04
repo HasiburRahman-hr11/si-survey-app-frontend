@@ -11,7 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import CallMissedOutgoingIcon from "@mui/icons-material/CallMissedOutgoing";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Divider } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -23,6 +23,7 @@ const AdminBar = () => {
   const { user, handleLogout } = useContext(AuthContext);
 
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     if (!user.isAdmin) {
@@ -104,7 +105,19 @@ const AdminBar = () => {
             <MenuList>
               <Link to="/admin">
                 <MenuItem
-                  sx={{ color: "#333", py: "15px" }}
+                  sx={{
+                    color: `${pathname === "/admin" ? "#3e3879" : "#222"}`,
+                    backgroundColor: `${
+                      pathname === "/admin" ? "rgb(213 240 245)" : "transparent"
+                    }`,
+                    py: "15px",
+                    transition: "all 0.5s ease",
+                    "&:hover": {
+                      backgroundColor: "rgb(242 247 248)",
+                      color: "#3e3879",
+                      transition: "all 0.5s ease",
+                    },
+                  }}
                   onClick={() => setOpenSidebar(false)}
                 >
                   <ListItemIcon>
@@ -116,7 +129,23 @@ const AdminBar = () => {
               <Divider />
               <Link to="/admin/missions">
                 <MenuItem
-                  sx={{ color: "#333", py: "15px" }}
+                  sx={{
+                    color: `${
+                      pathname === "/admin/missions" ? "#3e3879" : "#222"
+                    }`,
+                    backgroundColor: `${
+                      pathname === "/admin/missions"
+                        ? "rgb(213 240 245)"
+                        : "transparent"
+                    }`,
+                    py: "15px",
+                    transition: "all 0.5s ease",
+                    "&:hover": {
+                      backgroundColor: "rgb(242 247 248)",
+                      color: "#3e3879",
+                      transition: "all 0.5s ease",
+                    },
+                  }}
                   onClick={() => setOpenSidebar(false)}
                 >
                   <ListItemIcon>
@@ -140,7 +169,19 @@ const AdminBar = () => {
               <Divider />
               <Link to="/">
                 <MenuItem
-                  sx={{ color: "#333", py: "15px" }}
+                  sx={{
+                    color: `${pathname === "/" ? "#3e3879" : "#222"}`,
+                    backgroundColor: `${
+                      pathname === "/" ? "rgb(213 240 245)" : "transparent"
+                    }`,
+                    py: "15px",
+                    transition: "all 0.5s ease",
+                    "&:hover": {
+                      backgroundColor: "rgb(242 247 248)",
+                      color: "#3e3879",
+                      transition: "all 0.5s ease",
+                    },
+                  }}
                   onClick={() => setOpenSidebar(false)}
                 >
                   <ListItemIcon>

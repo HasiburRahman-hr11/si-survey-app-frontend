@@ -13,8 +13,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditMission from "../../Components/EditMission/EditMission";
 import DeleteMission from "../../Components/DeleteMission/DeleteMission";
 import AddMission from "../../Components/AddMission/AddMission";
-import {MissionContext} from "../../Context/MissionContext"
-
+import { MissionContext } from "../../Context/MissionContext";
 
 export const AllMissions = () => {
   const [openEdit, setOpenEdit] = useState(false);
@@ -23,7 +22,8 @@ export const AllMissions = () => {
   const [editMissionData, setEditMissionData] = useState({});
   const [deleteMissionId, setDeleteMissionId] = useState("");
 
-  const {missions, getAllMissions} = useContext(MissionContext)
+  const { missions, getAllMissions, loadingMissions } =
+    useContext(MissionContext);
 
   const handleOpenEdit = (missionData) => {
     if (missionData.title) {
@@ -35,7 +35,7 @@ export const AllMissions = () => {
     setDeleteMissionId(missionId);
     setOpenDelete(true);
   };
-  const handleOpenAddMission = (missionId) => {
+  const handleOpenAddMission = () => {
     setOpenAddMission(true);
   };
 
@@ -43,9 +43,9 @@ export const AllMissions = () => {
   const handleCloseDelete = () => setOpenDelete(false);
   const handleCloseAddMission = () => setOpenAddMission(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     getAllMissions();
-  },[]);
+  }, []);
   return (
     <>
       <AdminBar />
@@ -64,112 +64,183 @@ export const AllMissions = () => {
       />
 
       {/* Add Mission Modal */}
-      <AddMission openModal={openAddMission} handleCloseModal={handleCloseAddMission} />
+      <AddMission
+        openModal={openAddMission}
+        handleCloseModal={handleCloseAddMission}
+      />
 
       <Box sx={{ py: "4rem" }}>
         <Container maxWidth="xl">
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems:"center", mb:"50px" }}>
-            <Typography
-              component="h3"
-              variant="h3"
+          {missions.length === 0 ? (
+            <Box
               sx={{
-                fontFamily: '"Cormorant", serif',
-                fontWeight: "700",
+                width: "100%",
+                height: "100%",
+                backgroundColor: "fff",
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "50px 30px",
                 textAlign: "center",
               }}
             >
-              All Missions
-            </Typography>
-            <Box>
-              <Button variant="contained" size="medium" onClick={handleOpenAddMission}>
-                Add New Mission
-              </Button>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              backgroundColor: "#fff",
-              borderRadius: "7px",
-              boxShadow: " rgba(0, 0, 0, 0.16) 0px 1px 4px",
-            }}
-          >
-            <Table
-              sx={{ width: "100%", maxWidth: "100%" }}
-              aria-label="simple table"
-            >
-              <TableHead>
-                <TableRow>
-                  <TableCell>Serial</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell align="center">Total participants</TableCell>
-                  <TableCell align="center">Status</TableCell>
-                  <TableCell align="center">Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {missions.map((mission, index) => (
-                  <TableRow
-                    key={index}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              <Typography
+                variant="h1"
+                component="h1"
+                sx={{
+                  fontSize: {
+                    xs: "30px",
+                    md: "60px",
+                  },
+                  fontFamily: '"Cormorant", serif',
+                  fontWeight: "700",
+                }}
+              >
+                {loadingMissions
+                  ? "Loading Missions..."
+                  : "No Mission Available Now."}
+              </Typography>
+              <Box
+                sx={{
+                  width: "max-content",
+                  margin: "30px auto",
+                }}
+              >
+                {!loadingMissions ? (
+                  " "
+                ) : (
+                  <Button
+                    variant="contained"
+                    size="medium"
+                    onClick={handleOpenAddMission}
                   >
-                    <TableCell component="th" scope="row">
-                      {index + 1}
-                    </TableCell>
-                    <TableCell>{mission.title}</TableCell>
-                    <TableCell align="center">{mission?.participants?.length}</TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{ color: `${mission.isOpen ? "green" : "red"}` }}
-                    >
-                      {mission.isOpen ? "Open" : "Closed"}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box
+                    Add New Mission
+                  </Button>
+                )}
+              </Box>
+            </Box>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: "50px",
+                }}
+              >
+                <Typography
+                  component="h3"
+                  variant="h3"
+                  sx={{
+                    fontFamily: '"Cormorant", serif',
+                    fontWeight: "700",
+                    textAlign: "center",
+                  }}
+                >
+                  All Missions
+                </Typography>
+                <Box>
+                  <Button
+                    variant="contained"
+                    size="medium"
+                    onClick={handleOpenAddMission}
+                  >
+                    Add New Mission
+                  </Button>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  backgroundColor: "#fff",
+                  borderRadius: "7px",
+                  boxShadow: " rgba(0, 0, 0, 0.16) 0px 1px 4px",
+                }}
+              >
+                <Table
+                  sx={{ width: "100%", maxWidth: "100%" }}
+                  aria-label="simple table"
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Serial</TableCell>
+                      <TableCell>Title</TableCell>
+                      <TableCell align="center">Total participants</TableCell>
+                      <TableCell align="center">Status</TableCell>
+                      <TableCell align="center">Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {missions.map((mission, index) => (
+                      <TableRow
+                        key={index}
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
+                          "&:last-child td, &:last-child th": { border: 0 },
                         }}
                       >
-                        <Box
-                          sx={{
-                            width: "40px",
-                            height: "40px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            borderRadius: "50%",
-                            transition: "all 0.5s ease",
-                            "&:hover": { backgroundColor: "#B5E9F9" },
-                          }}
-                          onClick={() => handleOpenEdit(mission)}
+                        <TableCell component="th" scope="row">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell>{mission.title}</TableCell>
+                        <TableCell align="center">
+                          {mission?.participants?.length}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{ color: `${mission.isOpen ? "green" : "red"}` }}
                         >
-                          <EditIcon />
-                        </Box>
-                        <Box
-                          sx={{
-                            width: "40px",
-                            height: "40px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            borderRadius: "50%",
-                            transition: "all 0.5s ease",
-                            "&:hover": { backgroundColor: "#F3D2DD" },
-                          }}
-                          onClick={() => handleOpenDelete(mission._id)}
-                        >
-                          <DeleteOutlineIcon />
-                        </Box>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
+                          {mission.isOpen ? "Open" : "Closed"}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: "40px",
+                                height: "40px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                borderRadius: "50%",
+                                transition: "all 0.5s ease",
+                                "&:hover": { backgroundColor: "#B5E9F9" },
+                              }}
+                              onClick={() => handleOpenEdit(mission)}
+                            >
+                              <EditIcon />
+                            </Box>
+                            <Box
+                              sx={{
+                                width: "40px",
+                                height: "40px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                borderRadius: "50%",
+                                transition: "all 0.5s ease",
+                                "&:hover": { backgroundColor: "#F3D2DD" },
+                              }}
+                              onClick={() => handleOpenDelete(mission._id)}
+                            >
+                              <DeleteOutlineIcon />
+                            </Box>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </>
+          )}
         </Container>
       </Box>
     </>

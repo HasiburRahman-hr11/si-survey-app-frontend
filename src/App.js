@@ -6,14 +6,17 @@ import SignUp from "./Pages/SignUp/SignUp";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import { AllMissions } from "./Pages/AllMissions/AllMissions";
 import PrivateRoute from "./utils/PrivateRoute";
+import NotFound from "./Pages/NotFound/NotFound";
 
 const App = () => {
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+       
         <Route
           path="/admin"
           element={
@@ -30,6 +33,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
+         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

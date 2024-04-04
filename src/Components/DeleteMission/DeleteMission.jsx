@@ -26,7 +26,7 @@ const DeleteMission = ({ openModal, handleCloseModal, missionId }) => {
 
     try {
       const res = await axios.delete(
-        `http://localhost:8000/mission/delete/${missionId}`,
+        `${process.env.REACT_APP_BASE_API_URL}/mission/delete/${missionId}`,
         {
           headers: {
             Authorization: token,

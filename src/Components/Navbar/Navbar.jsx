@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useContext} from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContext";
 
@@ -18,7 +18,12 @@ const Navbar = () => {
       }}
     >
       <Box
-        sx={{ maxWidth: "1920px", margin: "0 auto", px: "50px", py: "10px" }}
+        sx={{
+          maxWidth: "1920px",
+          margin: "0 auto",
+          px: { xs: "20px", md: "50px" },
+          py: { xs: "0", md: "10px" },
+        }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box>
@@ -48,7 +53,18 @@ const Navbar = () => {
             <Box component="li">
               {user?.isAdmin && (
                 <Link to="/admin" style={{ textDecoration: "none" }}>
-                  <Typography sx={{ color: "#000", p: "10px" }}>
+                  <Typography
+                    sx={{
+                      color: "#000",
+                      p: "10px",
+                      transition: "all 0.5s ease",
+                      "&:hover": { color: "#566FFE" },
+                      fontSize: {
+                        xs: "0.8rem",
+                        sm: "1rem",
+                      },
+                    }}
+                  >
                     Dashboard
                   </Typography>
                 </Link>
@@ -57,14 +73,43 @@ const Navbar = () => {
             <Box component="li">
               {user?.email ? (
                 <Button
-                  sx={{ color: "#000", p: "10px" }}
+                  sx={{
+                    color: "#000",
+                    p: { xs: "5px 10px", sm: "7px 15px" },
+                    fontSize: {
+                      xs: "0.8rem",
+                      sm: "1rem",
+                    },
+                    textTransform: "capitalize",
+                    background: {
+                      xs: "rgb(181, 233, 249)",
+                    },
+                  }}
                   onClick={handleLogout}
                 >
                   Logout
                 </Button>
               ) : (
                 <Link to="/sign-in" style={{ textDecoration: "none" }}>
-                  <Typography sx={{ color: "#000", p: "10px" }}>
+                  <Typography
+                    sx={{
+                      color: "#000",
+                      p: { xs: "5px 10px", sm: "7px 15px" },
+                      fontSize: {
+                        xs: "0.8rem",
+                        sm: "1rem",
+                      },
+                      textTransform: "capitalize",
+                      background: {
+                        xs: "rgb(181, 233, 249)",
+                      },
+                      borderRadius:"5px",
+                      transition: "all 0.5s ease",
+                      "&:hover":{
+                        backgroundColor:"rgb(242 247 248)"
+                      }
+                    }}
+                  >
                     Sign In
                   </Typography>
                 </Link>

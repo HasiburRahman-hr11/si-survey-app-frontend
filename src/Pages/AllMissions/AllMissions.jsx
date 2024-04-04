@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AdminBar from "../../Components/AdminBar/AdminBar";
 import { Box, Button, Container, Typography } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -13,58 +13,8 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditMission from "../../Components/EditMission/EditMission";
 import DeleteMission from "../../Components/DeleteMission/DeleteMission";
 import AddMission from "../../Components/AddMission/AddMission";
+import {MissionContext} from "../../Context/MissionContext"
 
-const missions = [
-  {
-    _id: "001",
-    title: "Mission Title 1",
-    participants: 25,
-    description: "Dummy Description",
-    isOpen: true,
-  },
-  {
-    _id: "002",
-    title: "Mission Title 2",
-    participants: 20,
-    description: "Dummy Description",
-    isOpen: false,
-  },
-  {
-    _id: "003",
-    title: "Mission Title 3",
-    participants: 31,
-    description: "Dummy Description",
-    isOpen: true,
-  },
-  {
-    _id: "004",
-    title: "Mission Title 4",
-    participants: 26,
-    description: "Dummy Description",
-    isOpen: true,
-  },
-  {
-    _id: "005",
-    title: "Mission Title 5",
-    participants: 32,
-    description: "Dummy Description",
-    isOpen: true,
-  },
-  {
-    _id: "005",
-    title: "Mission Title 6",
-    participants: 46,
-    description: "Dummy Description",
-    isOpen: false,
-  },
-  {
-    _id: "006",
-    title: "Mission Title 7",
-    participants: 39,
-    description: "Dummy Description",
-    isOpen: true,
-  },
-];
 
 export const AllMissions = () => {
   const [openEdit, setOpenEdit] = useState(false);
@@ -72,6 +22,8 @@ export const AllMissions = () => {
   const [openAddMission, setOpenAddMission] = useState(false);
   const [editMissionData, setEditMissionData] = useState({});
   const [deleteMissionId, setDeleteMissionId] = useState("");
+
+  const {missions, getAllMissions} = useContext(MissionContext)
 
   const handleOpenEdit = (missionData) => {
     if (missionData.title) {
@@ -90,6 +42,10 @@ export const AllMissions = () => {
   const handleCloseEdit = () => setOpenEdit(false);
   const handleCloseDelete = () => setOpenDelete(false);
   const handleCloseAddMission = () => setOpenAddMission(false);
+
+  useEffect(()=>{
+    getAllMissions();
+  },[]);
   return (
     <>
       <AdminBar />
@@ -126,7 +82,7 @@ export const AllMissions = () => {
             </Typography>
             <Box>
               <Button variant="contained" size="medium" onClick={handleOpenAddMission}>
-                Add Mission
+                Add New Mission
               </Button>
             </Box>
           </Box>
@@ -160,7 +116,7 @@ export const AllMissions = () => {
                       {index + 1}
                     </TableCell>
                     <TableCell>{mission.title}</TableCell>
-                    <TableCell align="center">{mission.participants}</TableCell>
+                    <TableCell align="center">{mission?.participants?.length}</TableCell>
                     <TableCell
                       align="center"
                       sx={{ color: `${mission.isOpen ? "green" : "red"}` }}

@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useContext } from "react";
+import React, { useContext} from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContext";
 
@@ -23,8 +23,16 @@ const Navbar = () => {
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box>
             <Link to="/" style={{ textDecoration: "none" }}>
-              <Typography variant="h4" sx={{ color: "#000", py: "10px" }}>
-                Survey App
+              <Typography
+                variant="h4"
+                sx={{
+                  color: "#000",
+                  py: "10px",
+                  fontFamily: '"Cormorant", serif',
+                  fontWeight: "700",
+                }}
+              >
+                LoGo
               </Typography>
             </Link>
           </Box>
@@ -37,6 +45,15 @@ const Navbar = () => {
               margin: "0",
             }}
           >
+            <Box component="li">
+              {user?.isAdmin && (
+                <Link to="/admin" style={{ textDecoration: "none" }}>
+                  <Typography sx={{ color: "#000", p: "10px" }}>
+                    Dashboard
+                  </Typography>
+                </Link>
+              )}
+            </Box>
             <Box component="li">
               {user?.email ? (
                 <Button

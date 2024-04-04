@@ -1,42 +1,112 @@
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Alert from "@mui/material/Alert";
+import { MissionContext } from "../../Context/MissionContext";
+import axios from "axios";
 
 const EditMission = ({ openModal, handleCloseModal, missionData }) => {
-
   const [title, setTitle] = useState(missionData?.title || "");
   const [description, setDescription] = useState(
     missionData?.description || ""
   );
   const [isOpen, setIsOpen] = useState(missionData?.isOpen || true);
-  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [alertPopup, setAlertPopup] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = () => {
-    setUpdateSuccess(true);
-    handleCloseModal();
+  const { setMissions } = useContext(MissionContext);
+
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("sv-token");
+    closeAlertTimer();
+
+    if (!title) {
+      setError("Mission title is required!");
+      setAlertPopup(true);
+      return;
+    }
+    if (!token) {
+      setError(
+        "Unauthorized access. Only admins are allowed to edit missions."
+      );
+      setAlertPopup(true);
+      return;
+    }
+    setIsUpdating(true);
+
+    try {
+      const res = await axios.put(
+        `http://localhost:8000/mission/update/${missionData._id}`,
+        {
+          title,
+          description,
+          isOpen,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      if (res.status === 403) {
+        setError("Unauthorized access.");
+        setAlertPopup(true);
+      }
+      if (res.data) {
+        setMissions((prevMissions) => {
+          return prevMissions.map((mission) => {
+            if (mission._id === res.data.mission._id) {
+              return res.data.mission;
+            }
+            return mission;
+          });
+        });
+        setError("");
+        setResponseMessage("Mission updated successfully.");
+        setAlertPopup(true);
+        setTitle("");
+        setDescription("");
+        setIsOpen(true);
+        handleCloseModal();
+      }
+      setIsUpdating(false);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      setAlertPopup(true);
+      console.error(error);
+      setIsUpdating(false);
+    }
+  };
+  // Close Alert after 5 seconds
+  const closeAlertTimer = () => {
+    setTimeout(() => {
+      setAlertPopup(false);
+    }, 5000);
   };
 
   useEffect(() => {
-    setTitle(missionData?.title);
-    setDescription(missionData?.description);
-    setIsOpen(missionData?.isOpen);
-
-    // Close Alert after 5 seconds
-    let closeAlertTimer = setTimeout(() => {
-      setUpdateSuccess(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(closeAlertTimer);
-    };
+    if (missionData.title) {
+      setTitle(missionData?.title);
+      setDescription(missionData?.description);
+      setIsOpen(missionData?.isOpen);
+    }
   }, [missionData]);
   return (
     <>
-      {updateSuccess && (
-        <Alert severity="success" onClose={() => setUpdateSuccess(false)}>
-          Mission Updated Successfully.
+      {alertPopup && (
+        <Alert
+          sx={{ position: "fixed", top: "0", right: "0", zIndex: "1400" }}
+          severity={error ? "error" : "success"}
+          onClose={() => setAlertPopup(false)}
+        >
+          {error ? error : responseMessage}
         </Alert>
       )}
 
@@ -114,7 +184,7 @@ const EditMission = ({ openModal, handleCloseModal, missionData }) => {
                   mt: "20px",
                 }}
               >
-                Update
+                {isUpdating ? "Updating..." : "Update Mission"}
               </Button>
             </Box>
           </Box>

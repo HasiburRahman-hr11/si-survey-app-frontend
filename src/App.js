@@ -5,19 +5,31 @@ import Home from "./Pages/Home/Home";
 import SignUp from "./Pages/SignUp/SignUp";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import { AllMissions } from "./Pages/AllMissions/AllMissions";
-import { AllUsers } from "./Pages/AllUsers/AllUsers";
+import PrivateRoute from "./utils/PrivateRoute";
 
 const App = () => {
   return (
     <BrowserRouter>
-      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/admin" element={<Dashboard />} />
-        <Route path="/admin/missions" element={<AllMissions />} />
-        <Route path="/admin/users" element={<AllUsers />} />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/missions"
+          element={
+            <PrivateRoute>
+              <AllMissions />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

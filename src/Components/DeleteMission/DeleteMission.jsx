@@ -1,29 +1,78 @@
 import { Alert, Box, Button, Modal, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
+import { MissionContext } from "../../Context/MissionContext";
+import axios from "axios";
 
 const DeleteMission = ({ openModal, handleCloseModal, missionId }) => {
-  const [deleteSuccess, setDeleteSuccess] = useState(false);
-  const handleDeleteMission = () => {
-    setDeleteSuccess(true);
-    handleCloseModal();
+  const [alertPopup, setAlertPopup] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const { setMissions, missions } = useContext(MissionContext);
+
+  const handleDeleteMission = async () => {
+    const token = localStorage.getItem("sv-token");
+    closeAlertTimer();
+
+    if (!token) {
+      setError(
+        "Unauthorized access. Only admins are allowed to edit missions."
+      );
+      setAlertPopup(true);
+      return;
+    }
+    setIsDeleting(true);
+
+    try {
+      const res = await axios.delete(
+        `http://localhost:8000/mission/delete/${missionId}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      if (res.status === 403) {
+        setError("Unauthorized access.");
+        setAlertPopup(true);
+      }
+      if (res.data) {
+        setMissions(missions.filter((mission) => mission._id !== missionId));
+        setError("");
+        setResponseMessage("Mission deleted successfully.");
+        setAlertPopup(true);
+
+        handleCloseModal();
+      }
+      setIsDeleting(false);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      setAlertPopup(true);
+      console.error(error);
+      setIsDeleting(false);
+    }
+  };
+  // Close Alert after 5 seconds
+  const closeAlertTimer = () => {
+    setTimeout(() => {
+      setAlertPopup(false);
+    }, 5000);
   };
 
-  useEffect(() => {
-
-    // Close Alert after 5 seconds
-    let closeAlertTimer = setTimeout(() => {
-      setDeleteSuccess(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(closeAlertTimer);
-    };
-  }, [missionId]);
   return (
     <>
-      {deleteSuccess && (
-        <Alert severity="success" onClose={() => setDeleteSuccess(false)}>
-          Mission (Id:{missionId}) Deleted Successfully.
+      {alertPopup && (
+        <Alert
+          sx={{ position: "fixed", top: "0", right: "0", zIndex: "1400" }}
+          severity={error ? "error" : "success"}
+          onClose={() => setAlertPopup(false)}
+        >
+          {error ? error : responseMessage}
         </Alert>
       )}
       <Modal
@@ -69,7 +118,7 @@ const DeleteMission = ({ openModal, handleCloseModal, missionId }) => {
               sx={{ margin: "10px" }}
               onClick={handleDeleteMission}
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </Button>
             <Button
               variant="contained"

@@ -1,40 +1,95 @@
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Alert from "@mui/material/Alert";
+import axios from "axios";
+import { MissionContext } from "../../Context/MissionContext";
 
 const AddMission = ({ openModal, handleCloseModal }) => {
-  const [addMissionSuccess, setAddMissionSuccess] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isOpen, setIsOpen] = useState(true);
+  const [alertPopup, setAlertPopup] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = () => {
-    if (!title || !description) {
-      alert("Please Fill The Form First!");
-    } else {
-      setAddMissionSuccess(true);
-      handleCloseModal();
+  const { missions, setMissions } = useContext(MissionContext);
+
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("sv-token");
+    closeAlertTimer();
+
+    if (!title) {
+      setError("Mission title is required!");
+      setAlertPopup(true);
+      return;
+    }
+    if (!token) {
+      setError(
+        "Unauthorized access. Only admins are allowed to create missions."
+      );
+      setAlertPopup(true);
+      return;
+    }
+    setIsCreating(true);
+
+    try {
+      const res = await axios.post(
+        `http://localhost:8000/mission/create`,
+        {
+          title,
+          description,
+          isOpen,
+        },
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      if (res.status === 403) {
+        setError("Unauthorized access.");
+        setAlertPopup(true);
+      }
+      if (res.data) {
+        setMissions([res.data.mission, ...missions]);
+        setError("");
+        setResponseMessage("Mission created successfully.");
+        setAlertPopup(true);
+        setTitle("");
+        setDescription("");
+        setIsOpen(true);
+        handleCloseModal();
+      }
+      setIsCreating(false);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setError(error.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+      setAlertPopup(true);
+      console.error(error);
+      setIsCreating(false);
     }
   };
-
-  useEffect(() => {
-    // Close Alert after 5 seconds
-    let closeAlertTimer = setTimeout(() => {
-      setAddMissionSuccess(false);
+  // Close Alert after 5 seconds
+  const closeAlertTimer = () => {
+    setTimeout(() => {
+      setAlertPopup(false);
     }, 5000);
-
-    return () => {
-      clearTimeout(closeAlertTimer);
-    };
-  }, []);
-
+  };
   return (
     <>
-      {addMissionSuccess && (
-        <Alert severity="success" onClose={() => setAddMissionSuccess(false)}>
-          Mission Added Successfully.
+      {alertPopup && (
+        <Alert
+          sx={{ position: "fixed", top: "0", right: "0", zIndex: "1400" }}
+          severity={error ? "error" : "success"}
+          onClose={() => setAlertPopup(false)}
+        >
+          {error ? error : responseMessage}
         </Alert>
       )}
 
@@ -112,7 +167,7 @@ const AddMission = ({ openModal, handleCloseModal }) => {
                   mt: "20px",
                 }}
               >
-                Add Mission
+                {isCreating ? "Creating..." : "Add Mission"}
               </Button>
             </Box>
           </Box>
